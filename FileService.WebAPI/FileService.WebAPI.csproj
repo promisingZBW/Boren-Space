@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>d4474567-f278-4fd9-b6dc-8b3bf144a3ea</UserSecretsId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.19" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
+		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\CommonInitializer\CommonInitializer.csproj" />
+		<ProjectReference Include="..\FileService.Domain\FileService.Domain.csproj" />
+		<ProjectReference Include="..\FileService.Infrastructure\FileService.Infrastructure.csproj" />
+	</ItemGroup>
+
+</Project>

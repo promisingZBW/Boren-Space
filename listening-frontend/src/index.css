@@ -1,0 +1,372 @@
+/*.css它是 纯文本文件，里面写的是 CSS 代码，用于描述网页中 HTML 元素的外观和布局，比如：颜色、字体、边距、对齐、动画等。*/
+
+
+/* 全局样式重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/*设置全局字体*/
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  min-height: 100vh;
+  position: relative;
+  /* 只设置背景色 */
+  background-color: #f5f5f5;
+}
+
+/* 左侧装饰图片 - 透明PNG */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  pointer-events: none; /* 不影响页面交互 */
+  z-index: 0;
+  /* 分开设置背景色和背景图片 */
+  background-color: #f5f5f5;
+  background-image: url('/images/left.png');
+  background-position: left center;
+  background-size: 250px auto;
+  background-repeat: no-repeat;
+  opacity: 0.9;
+}
+
+/* 右侧装饰图片 - 透明PNG */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  pointer-events: none; /* 不影响页面交互 */
+  z-index: 0;
+  /* 分开设置背景色和背景图片 */
+  background-color: #f5f5f5;
+  background-image: url('/images/right.png');
+  background-position: right center;
+  background-size: 250px auto;
+  background-repeat: no-repeat;
+  opacity: 0.9;
+}
+
+/*
+设置根元素的排列方式，
+display: flex; 的核心就是启用 弹性盒子布局（Flexbox Layout）它的目标是让容器里的元素（子元素）在 水平方向或垂直方向 上能够更加灵活地排列、对齐和分配空间。
+页面结构垂直排列（Header → Content → Footer），至少占满整个屏幕，从上到下依次排列
+*/
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: transparent; /* 让背景透明，显示 body 的背景图片 */
+  position: relative;
+  z-index: 1; /* 确保内容在渐变遮罩之上 */
+}
+
+/* Ant Design Layout 组件背景透明 */
+.app-layout {
+  background: transparent !important;
+  min-height: 100vh;
+}
+
+
+/* 
+Header样式 ：
+fixed：相对于视口固定，滚动时不移动
+top/left/right: 0：贴合顶部和左右边缘
+不设置 bottom，高度由内容决定
+!important：最高优先级，覆盖其他所有样式
+1000 确保 Header 在其他内容之上
+.....
+*/
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #001529 !important;
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 64px;
+}
+
+
+
+.logo {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.logo-icon {
+  font-size: 24px;
+  margin-right: 8px;
+  color: #1890ff;
+}
+
+.logo-text {
+  white-space: nowrap;
+}
+
+.nav-menu {
+  flex: 1;
+  border: none;
+  background: transparent;
+  margin: 0 40px;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+}
+
+.user-button {
+  color: #fff !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.username {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .username {
+    display: inline;
+  }
+}
+
+/* 主内容区域 */
+.main-content {
+  flex: 1;
+  margin-top: 64px;
+  min-height: calc(100vh - 64px - 70px);
+  padding: 24px;
+  background: transparent; /* 让背景透明，显示 body 的背景图片 */
+}
+
+.content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: transparent; /* 让背景透明，显示 body 的背景图片 */
+}
+
+/* Footer样式 */
+.footer {
+  background: #001529;
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+  margin-top: auto;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-left,
+.footer-center,
+.footer-right {
+  flex: 1;
+  min-width: 150px;
+}
+
+.footer-center {
+  text-align: center;
+}
+
+.footer-right {
+  text-align: right;
+}
+
+.heart-icon {
+  color: #ff4d4f;
+  margin: 0 4px;
+}
+
+.footer-link {
+  color: #fff;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.footer-link:hover {
+  color: #1890ff;
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .footer-left,
+  .footer-center,
+  .footer-right {
+    text-align: center;
+  }
+}
+
+/* EpisodeCard样式 */
+.episode-card {
+  margin-bottom: 24px;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  height: 100%; /* 让卡片占满整个网格单元格 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 确保 Ant Design Card 内容区域也使用 flex 布局 */
+.episode-card .ant-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.episode-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.episode-cover {
+  position: relative;
+  width: 100%;
+  height: 240px;  /* 增加高度 */
+  overflow: hidden;
+  background-color: #f0f0f0;  /* 添加这行 */
+}
+
+.episode-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;  /* 添加这行 */
+  transition: transform 0.3s ease;
+}
+
+.episode-cover:hover img {
+  transform: scale(1.05);
+}
+
+.play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.episode-cover:hover .play-overlay {
+  opacity: 1;
+}
+
+.play-button {
+  width: 72px !important;   /* 从 56px 改为 72px，增加 !important */
+  height: 72px !important;  /* 从 56px 改为 72px，增加 !important */
+  min-width: 72px !important;  /* 添加这行 */
+  min-height: 72px !important; /* 添加这行 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;  /* 从 24px 改为 32px */
+  flex-shrink: 0;   /* 添加这行 */
+  border-radius: 50% !important;  /* 添加这行，强制圆形 */
+}
+
+.episode-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 8px;
+}
+
+.episode-title span {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.episode-description {
+  color: #8c8c8c;
+  min-height: 48px; /* 固定最小高度，确保所有卡片高度一致（约2行文本的高度） */
+}
+
+.episode-description p {
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* 限制显示2行 */
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis; /* 添加省略号 */
+  word-break: break-word; /* 处理长单词换行 */
+  line-height: 1.5; /* 设置行高，让文本更清晰 */
+}
+
+.episode-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* 响应式网格 - 使用 Ant Design Row/Col 布局，不需要额外的 grid 样式 */
+.episodes-grid {
+  margin-top: 24px;
+}
+
+/* 加载和空状态 */
+.loading-container,
+.empty-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.empty-container {
+  color: #8c8c8c;
+}

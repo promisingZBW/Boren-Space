@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
+		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\IdentityService.Domain\IdentityService.Domain.csproj" />
+		<ProjectReference Include="..\Zbw.Infrastructure\Zbw.Infrastructure.csproj" />
+		<ProjectReference Include="..\Zbw.DomainCommons\Zbw.DomainCommons.csproj" />
+	</ItemGroup>
+
+</Project>

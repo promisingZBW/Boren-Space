@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+		<PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+		<PackageReference Include="StackExchange.Redis" Version="2.7.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\FileService.Infrastructure\FileService.Infrastructure.csproj" />
+		<ProjectReference Include="..\IdentityService.Infrastructure\IdentityService.Infrastructure.csproj" />
+		<ProjectReference Include="..\Listening.Infrastructure\Listening.Infrastructure.csproj" />
+		<ProjectReference Include="..\Zbw.ASPNETCore\Zbw.ASPNETCore.csproj" />
+		<ProjectReference Include="..\Zbw.Commons\Zbw.Commons.csproj" />
+		<ProjectReference Include="..\Zbw.EventBus\Zbw.EventBus.csproj" />
+		<ProjectReference Include="..\Zbw.JWT\Zbw.JWT.csproj" />
+	</ItemGroup>
+
+</Project>

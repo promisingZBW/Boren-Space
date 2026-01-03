@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- EF Core 相关包 -->
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
+
+		<!-- AWS S3 SDK -->
+		<PackageReference Include="AWSSDK.S3" Version="3.7.402.11" />
+		<PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.301" />
+
+		<!-- 配置和DI -->
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\FileService.Domain\FileService.Domain.csproj" />
+		<ProjectReference Include="..\Zbw.Infrastructure\Zbw.Infrastructure.csproj" />
+		<ProjectReference Include="..\Zbw.DomainCommons\Zbw.DomainCommons.csproj" />
+	</ItemGroup>
+
+</Project>

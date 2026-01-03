@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "IdentityService.WebAPI": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:58834;http://localhost:58836"
+    }
+  }
+}

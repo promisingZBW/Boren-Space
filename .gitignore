@@ -1,0 +1,173 @@
+## ========================================
+## .NET Core 项目
+## ========================================
+
+# 编译输出
+bin/
+obj/
+publish/
+
+# NuGet 本地包
+*.nupkg
+*.snupkg
+
+# Visual Studio 用户配置
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# 构建结果
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa]rm/
+[Aa]rm64/
+bld/
+[Bb]in/
+[Oo]bj/
+
+## ========================================
+## 日志和临时文件
+## ========================================
+
+*.log
+logs/
+*.tmp
+*.temp
+
+## ========================================
+## 敏感配置文件（重要！）
+## ========================================
+
+# 开发和生产环境配置（包含敏感信息）
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Staging.json
+appsettings.*.json
+
+# 但保留基础配置和示例配置
+!appsettings.json
+!appsettings.Example.json
+
+# AWS 密钥文件
+*.pem
+*.key
+
+## ========================================
+## 前端 Node.js 项目
+## ========================================
+
+# 依赖包（非常大！）
+node_modules/
+
+# 构建输出
+dist/
+dist-ssr/
+build/
+
+# 环境变量文件
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# 前端日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+## ========================================
+## IDE 和编辑器
+## ========================================
+
+# Visual Studio
+.vs/
+*.vspscc
+*.vssscc
+.builds
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+*.DotSettings.user
+
+## ========================================
+## 操作系统
+## ========================================
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+
+## ========================================
+## 数据库和备份
+## ========================================
+
+*.mdf
+*.ldf
+*.bak
+*.backup
+
+## ========================================
+## 测试和覆盖率
+## ========================================
+
+# 测试结果
+TestResults/
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+
+# 覆盖率报告
+coverage/
+*.lcov
+
+## ========================================
+## 其他
+## ========================================
+
+# 打包文件
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# 临时文件
+*.swp
+*.swo
+*~
+
+# 本地文件存储（如果使用本地存储）
+FileStorage/
+
+# Entity Framework 迁移脚本（可选，根据需要调整）
+# Migrations/
+
