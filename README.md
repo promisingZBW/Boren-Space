@@ -203,12 +203,15 @@ npm run dev
 
 
 ## 📸 Project Showcase
-#### Home Page
+
+### Home Page
 <img width="2557" height="1347" alt="image" src="https://github.com/user-attachments/assets/5b41a5cd-8466-4c6d-b7ab-7a36de1dd456" />
 
 <img width="2556" height="1344" alt="image" src="https://github.com/user-attachments/assets/667699e3-598d-40fc-a98c-c775cdb1edf7" />
+
 ### Player Interface
 <img width="2559" height="1341" alt="image" src="https://github.com/user-attachments/assets/0c20d699-9dab-45be-839c-8960d05aa86d" />
+
 ### Audio Management Page
 <img width="2554" height="1338" alt="image" src="https://github.com/user-attachments/assets/0b47682f-b8f7-406c-a3a3-9f41dbdfd967" />
 
