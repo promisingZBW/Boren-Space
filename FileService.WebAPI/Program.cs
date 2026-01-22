@@ -9,39 +9,43 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Zbw.ASPNETCore.Filters;
 using Zbw.JWT;
+using Npgsql.EntityFrameworkCore.PostgreSQL;  
+
+// å¯ç”¨ä¼ ç»Ÿæ—¶é—´æˆ³è¡Œä¸ºï¼ˆå…¼å®¹ DateTime.Nowï¼‰
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ÅäÖÃÍ¨ÓÃ·şÎñ£¨Ê¹ÓÃÕıÈ·µÄ·½·¨Ãû£©
+// ï¿½ï¿½ï¿½ï¿½Í¨ï¿½Ã·ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½È·ï¿½Ä·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 var initOptions = builder.Configuration.GetSection("InitializerOptions").Get<InitializerOptions>()
     ?? new InitializerOptions { LogFilePath = "logs/app.log" };
 
 builder.ConfigureExtraServices(initOptions);
 
-// ×¢²á FileService µÄ DbContext
+// ×¢ï¿½ï¿½ FileService ï¿½ï¿½ DbContext
 builder.Services.AddDbContext<FSDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultDB");
-    options.UseSqlServer(connectionString);
+    options.UseNpgsql(connectionString);
 });
 
-// ÏÔÊ½×¢²áÎª»ùÀà DbContext£¨ÓÃÓÚ UnitOfWork£©
+// ï¿½ï¿½Ê½×¢ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ DbContextï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ UnitOfWorkï¿½ï¿½
 builder.Services.AddScoped<DbContext>(provider =>
     provider.GetRequiredService<FSDbContext>());
 
-// ×¢²á FileService Ïà¹Ø·şÎñ
+// ×¢ï¿½ï¿½ FileService ï¿½ï¿½Ø·ï¿½ï¿½ï¿½
 builder.Services.AddFileServiceInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IFSRepository, FSRepository>();
 builder.Services.AddScoped<FSDomainService>();
 
-// ÅäÖÃJWTÈÏÖ¤
+// ï¿½ï¿½ï¿½ï¿½JWTï¿½ï¿½Ö¤
 var jwtOptions = builder.Configuration.GetSection("JWT").Get<JWTOptions>();
 if (jwtOptions != null)
 {
     builder.Services.Configure<JWTOptions>(builder.Configuration.GetSection("JWT"));
     builder.Services.AddScoped<IJWTService, JWTService>();
 
-    // ÅäÖÃJWTÈÏÖ¤
+    // ï¿½ï¿½ï¿½ï¿½JWTï¿½ï¿½Ö¤
     builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -65,20 +69,36 @@ if (jwtOptions != null)
 
 builder.Services.AddAuthorization();
 
+// é…ç½®CORS - å…è®¸å‰ç«¯è·¨åŸŸè®¿é—®
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:3000",           // æœ¬åœ°å¼€å‘
+                "http://3.107.216.226",            // EC2 å‰ç«¯
+                "https://*.vercel.app"             // Vercel éƒ¨ç½²
+              )
+              .SetIsOriginAllowedToAllowWildcardSubdomains()  // å…è®¸ Vercel å­åŸŸå
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
 
-// ÅäÖÃ¿ØÖÆÆ÷
+// ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<UnitOfWorkFilter>();
 });
 
-// Ìí¼ÓSwagger
+// ï¿½ï¿½ï¿½ï¿½Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "FileService API", Version = "v1" });
 
-    // Ìí¼ÓJWTÈÏÖ¤Ö§³Öµ½Swagger
+    // ï¿½ï¿½ï¿½ï¿½JWTï¿½ï¿½Ö¤Ö§ï¿½Öµï¿½Swagger
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
@@ -109,7 +129,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// ÅäÖÃÖĞ¼ä¼ş¹ÜµÀ
+// ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¼ï¿½ï¿½ï¿½Üµï¿½
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -118,9 +138,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors();
-app.UseAuthentication();  // ÖØÒª£ºÈÏÖ¤ÖĞ¼ä¼ş
-app.UseAuthorization();   // ÖØÒª£ºÊÚÈ¨ÖĞ¼ä¼ş
+app.UseCors("AllowFrontend");  // ä½¿ç”¨CORSç­–ç•¥
+app.UseAuthentication();  // ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½Ö¤ï¿½Ğ¼ï¿½ï¿½
+app.UseAuthorization();   // ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½È¨ï¿½Ğ¼ï¿½ï¿½
 app.MapControllers();
 
 app.Run();

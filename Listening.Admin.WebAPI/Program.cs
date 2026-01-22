@@ -13,6 +13,10 @@ using System;
 using System.Collections.Generic;
 using System.Text; // ?? ���ӱ���֧��
 using Zbw.JWT; // ?? ����JWTѡ��
+using Npgsql.EntityFrameworkCore.PostgreSQL;
+
+// 启用传统时间戳行为（兼容 DateTime.Now）
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +31,7 @@ builder.ConfigureExtraServices(new InitializerOptions
 builder.Services.AddDbContext<ListeningDbContext>(options =>
 {
     var connStr = builder.Configuration.GetValue<string>("DefaultDB:ConnStr");
-    options.UseSqlServer(connStr);
+    options.UseNpgsql(connStr);
 });
 
 builder.Services.AddScoped<IListeningRepository, ListeningRepository>();
@@ -131,7 +135,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins(
+                "http://localhost:3000",           // 本地开发
+                "http://3.107.216.226",            // EC2 前端
+                "https://*.vercel.app"             // Vercel 部署
+              )
+              .SetIsOriginAllowedToAllowWildcardSubdomains()  // 允许 Vercel 子域名
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();

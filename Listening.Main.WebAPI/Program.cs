@@ -4,34 +4,59 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
+using System; 
+
+// å¯ç”¨ä¼ ç»Ÿæ—¶é—´æˆ³è¡Œä¸ºï¼ˆå…¼å®¹ DateTime.Nowï¼‰
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ÅäÖÃÍ¨ÓÃ·şÎñ
+// ï¿½ï¿½ï¿½ï¿½Í¨ï¿½Ã·ï¿½ï¿½ï¿½
 builder.ConfigureExtraServices(new InitializerOptions
 {
     LogFilePath = "logs/listening-main.log",
     EventBusQueueName = "Listening.Main"
 });
 
-// ×¢²áÌıÁ¦·şÎñÌØ¶¨µÄ·şÎñ
+// ×¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¶ï¿½ï¿½Ä·ï¿½ï¿½ï¿½
 builder.Services.AddDbContext<ListeningDbContext>(options =>
 {
     var connStr = builder.Configuration.GetValue<string>("DefaultDB:ConnStr");
-    options.UseSqlServer(connStr);
+    options.UseNpgsql(connStr);
 });
 
 builder.Services.AddScoped<IListeningRepository, ListeningRepository>();
 
-// Ìí¼ÓSignalRÖ§³Ö£¨Îª½«À´µÄÊµÊ±¹¦ÄÜ×¼±¸£©
+// é…ç½®CORS - å…è®¸å‰ç«¯è·¨åŸŸè®¿é—®
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:3000",           // æœ¬åœ°å¼€å‘
+                "http://3.107.216.226",            // EC2 å‰ç«¯
+                "https://*.vercel.app"             // Vercel éƒ¨ç½²
+              )
+              .SetIsOriginAllowedToAllowWildcardSubdomains()  // å…è®¸ Vercel å­åŸŸå
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
+// ï¿½ï¿½ï¿½ï¿½SignalRÖ§ï¿½Ö£ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÊµÊ±ï¿½ï¿½ï¿½ï¿½×¼ï¿½ï¿½ï¿½ï¿½
 builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-// Ê¹ÓÃÍ¨ÓÃÖĞ¼ä¼şÅäÖÃ
+// Ê¹ï¿½ï¿½Í¨ï¿½ï¿½ï¿½Ğ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 app.UseZbwDefault();
 
-// ÅäÖÃSignalR Hub£¨½«À´¿ÉÒÔÓÃÓÚÊµÊ±Ñ§Ï°½ø¶È£©
+// å¯ç”¨CORS
+app.UseCors("AllowFrontend");
+
+// ï¿½ï¿½ï¿½ï¿½SignalR Hubï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÊµÊ±Ñ§Ï°ï¿½ï¿½ï¿½È£ï¿½
 // app.MapHub<LearningHub>("/hubs/learning");
 
 app.Run();

@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:16-alpine
+    container_name: elweb-postgres
+    environment:
+      # 超级用户密码
+      POSTGRES_PASSWORD: dev_password_123
+      # 默认数据库
+      POSTGRES_DB: elwebdb_dev
+      # 默认用户（可选，默认是 postgres）
+      POSTGRES_USER: postgres
+    ports:
+      # 主机端口:容器端口
+      - "5432:5432"
+    volumes:
+      # 持久化数据（重启不丢失）
+      - postgres_data:/var/lib/postgresql/data
+      # 初始化脚本（用的是efcore，所以这里不需要）
+      # - ./docker-init:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - elweb-network
+
+  # pgAdmin 管理界面（可选，推荐）
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: elweb-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@elweb.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - elweb-network
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+# 定义数据卷（持久化存储）
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+# 定义网络
+networks:
+  elweb-network:
+    driver: bridge

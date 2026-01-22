@@ -47,7 +47,7 @@ namespace CommonInitializer
                 {
                     throw new InvalidOperationException("数据库连接字符串未配置");
                 }
-                ctx.UseSqlServer(connStr);
+                ctx.UseNpgsql(connStr);
             }, assemblies);
 
             // 配置身份验证

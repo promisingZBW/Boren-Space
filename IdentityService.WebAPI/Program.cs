@@ -1,7 +1,7 @@
 using CommonInitializer;
 using IdentityService.Infrastructure;
-using IdentityService.WebAPI.Middleware;// ¡û TokenºÚÃûµ¥·şÎñĞèÒªÌí¼ÓÕâĞĞ
-using Microsoft.AspNetCore.Authentication.JwtBearer; // ?? Ìí¼ÓJWTÖ§³Ö
+using IdentityService.WebAPI.Middleware;// ï¿½ï¿½ Tokenï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+using Microsoft.AspNetCore.Authentication.JwtBearer; // ?? ï¿½ï¿½ï¿½ï¿½JWTÖ§ï¿½ï¿½
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,42 +9,46 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens; // ?? Ìí¼ÓTokenÑéÖ¤
+using Microsoft.IdentityModel.Tokens; // ?? ï¿½ï¿½ï¿½ï¿½Tokenï¿½ï¿½Ö¤
 using System;
 using System.Collections.Generic;
-using System.Text; //  Ìí¼Ó±àÂëÖ§³Ö
+using System.Text; //  ï¿½ï¿½ï¿½Ó±ï¿½ï¿½ï¿½Ö§ï¿½ï¿½
 using Zbw.ASPNETCore.Filters;
-using Zbw.JWT; //  Ìí¼ÓJWTÑ¡Ïî
+using Zbw.JWT; //  ï¿½ï¿½ï¿½ï¿½JWTÑ¡ï¿½ï¿½
+using Npgsql.EntityFrameworkCore.PostgreSQL;  
+
+// å¯ç”¨ä¼ ç»Ÿæ—¶é—´æˆ³è¡Œä¸ºï¼ˆå…¼å®¹ DateTime.Nowï¼‰
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ÅäÖÃÍ¨ÓÃ·şÎñ
+// ï¿½ï¿½ï¿½ï¿½Í¨ï¿½Ã·ï¿½ï¿½ï¿½
 builder.ConfigureExtraServices(new InitializerOptions
 {
     LogFilePath = "logs/identity-service.log",
     EventBusQueueName = "IdentityService"
 });
 
-// ×¢²áÊı¾İ·şÎñÏà¹ØµÄ·şÎñ
+// ×¢ï¿½ï¿½ï¿½ï¿½ï¿½İ·ï¿½ï¿½ï¿½ï¿½ï¿½ØµÄ·ï¿½ï¿½ï¿½
 builder.Services.AddDbContext<IdentityDbContext>(options =>
 {
     var connStr = builder.Configuration.GetValue<string>("DefaultDB:ConnStr");
-    options.UseSqlServer(connStr);
+    options.UseNpgsql(connStr);
 });
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
-builder.Services.AddSingleton<ITokenBlacklistService, TokenBlacklistService>(); // ¡û TokenºÚÃûµ¥·şÎñĞèÒªÌí¼ÓÕâĞĞ
-builder.Services.AddMemoryCache();// Ìí¼ÓÄÚ´æ»º´æµÄ×¢²á
+builder.Services.AddSingleton<ITokenBlacklistService, TokenBlacklistService>(); // ï¿½ï¿½ Tokenï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+builder.Services.AddMemoryCache();// ï¿½ï¿½ï¿½ï¿½ï¿½Ú´æ»ºï¿½ï¿½ï¿½×¢ï¿½ï¿½
 
-// ?? ÅäÖÃJWTÈÏÖ¤
+// ?? ï¿½ï¿½ï¿½ï¿½JWTï¿½ï¿½Ö¤
 var jwtOptions = builder.Configuration.GetSection("JWT").Get<JWTOptions>();
 if (jwtOptions != null)
 {
     builder.Services.Configure<JWTOptions>(builder.Configuration.GetSection("JWT"));
     builder.Services.AddScoped<IJWTService, JWTService>();
 
-    // Ìí¼ÓJWTÈÏÖ¤
+    // ï¿½ï¿½ï¿½ï¿½JWTï¿½ï¿½Ö¤
     builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -68,13 +72,13 @@ if (jwtOptions != null)
 
 builder.Services.AddAuthorization();
 
-// ?? ÅäÖÃSwagger£¨°üº¬JWTÖ§³Ö£©
+// ?? ï¿½ï¿½ï¿½ï¿½Swaggerï¿½ï¿½ï¿½ï¿½ï¿½ï¿½JWTÖ§ï¿½Ö£ï¿½
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "Identity Service API", Version = "v1" });
 
-    // Ìí¼ÓJWTÈÏÖ¤Ö§³Öµ½Swagger£¨ËäÈ»Identity·şÎñÖ÷ÒªÓÃÓÚÉú³ÉToken£¬µ«Ò²¿ÉÒÔÓĞĞèÒªÈÏÖ¤µÄAPI£©
+    // ï¿½ï¿½ï¿½ï¿½JWTï¿½ï¿½Ö¤Ö§ï¿½Öµï¿½Swaggerï¿½ï¿½ï¿½ï¿½È»Identityï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Tokenï¿½ï¿½ï¿½ï¿½Ò²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Ö¤ï¿½ï¿½APIï¿½ï¿½
     if (jwtOptions != null)
     {
         c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
@@ -106,12 +110,17 @@ builder.Services.AddSwaggerGen(c =>
     }
 });
 
-// ÅäÖÃcorsÔ­Òò£ºÇ°¶ËÖ±½Óµ÷ÓÃµÇÂ¼½Ó¿Ú
+// é…ç½®CORS - å…è®¸å‰ç«¯è·¨åŸŸè®¿é—®
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")  // ÄãµÄÇ°¶Ë¶Ë¿Ú
+        policy.WithOrigins(
+                "http://localhost:3000",           // æœ¬åœ°å¼€å‘
+                "http://3.107.216.226",            // EC2 å‰ç«¯
+                "https://*.vercel.app"             // Vercel éƒ¨ç½²
+              )
+              .SetIsOriginAllowedToAllowWildcardSubdomains()  // å…è®¸ Vercel å­åŸŸå
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -121,7 +130,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// ÅäÖÃÖĞ¼ä¼ş¹ÜµÀ
+// ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¼ï¿½ï¿½ï¿½Üµï¿½
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -130,9 +139,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowFrontend"); // Ê¹ÓÃCORS²ßÂÔ£¬Õâ¶ÎÓëÉÏÃæÅäÖÃµÄCORS¶ÔÓ¦
+app.UseCors("AllowFrontend"); // Ê¹ï¿½ï¿½CORSï¿½ï¿½ï¿½Ô£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½CORSï¿½ï¿½Ó¦
 
-// ÅäÖÃJWTºÚÃûµ¥ÖĞ¼ä¼ş£¨ÔÚÈÏÖ¤ÖĞ¼ä¼şÖ®ºó£©
+// ï¿½ï¿½ï¿½ï¿½JWTï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤ï¿½Ğ¼ï¿½ï¿½Ö®ï¿½ï¿½
 app.UseAuthentication();
 app.UseMiddleware<JwtBlacklistMiddleware>();
 app.UseAuthorization();

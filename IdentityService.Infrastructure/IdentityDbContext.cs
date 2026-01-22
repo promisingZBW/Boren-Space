@@ -62,11 +62,11 @@ namespace IdentityService.Infrastructure
                 //如果某个用户名被标记为已删除（IsDeleted = 1），该用户名可以被其他非删除用户使用。
                 entity.HasIndex(u => u.UserName)
                     .IsUnique()
-                    .HasFilter("[IsDeleted] = 0");
+                    .HasFilter("\"IsDeleted\" = false");
 
                 entity.HasIndex(u => u.Email)
                     .IsUnique()
-                    .HasFilter("[IsDeleted] = 0");
+                    .HasFilter("\"IsDeleted\" = false");
 
                 // 全局查询过滤器：排除已删除的用户,即 IsDeleted 为 true 的用户在查询中不会被返回
                 entity.HasQueryFilter(u => !u.IsDeleted);

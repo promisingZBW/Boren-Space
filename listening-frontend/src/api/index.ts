@@ -5,7 +5,7 @@ import { storage } from '@/utils';
 
 // 创建axios实例
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',  // 使用环境变量
   timeout: 10000,
 });
 

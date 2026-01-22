@@ -46,9 +46,9 @@ appsettings.Development.json
 appsettings.Production.json
 appsettings.Staging.json
 appsettings.*.json
+appsettings.json
 
 # 但保留基础配置和示例配置
-!appsettings.json
 !appsettings.Example.json
 
 # AWS 密钥文件
@@ -63,9 +63,9 @@ appsettings.*.json
 node_modules/
 
 # 构建输出
-dist/
-dist-ssr/
-build/
+dist
+dist-ssr
+*.local
 
 # 环境变量文件
 .env

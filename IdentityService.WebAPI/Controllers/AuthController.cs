@@ -21,51 +21,51 @@ namespace IdentityService.WebAPI.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IPasswordService _passwordService;
         private readonly IJWTService _jwtService;
-        private readonly ITokenBlacklistService _blacklistService; // ¡û TokenºÚÃûµ¥»úÖÆÐèÒªÌí¼ÓÕâ¸ö×Ö¶Î
+        private readonly ITokenBlacklistService _blacklistService; // ï¿½ï¿½ Tokenï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶ï¿½
 
         public AuthController(
             IUserRepository userRepository,
             IPasswordService passwordService,
             IJWTService jwtService,
-            ITokenBlacklistService blacklistService) // ¡û Ìí¼ÓÕâ¸ö²ÎÊý
+            ITokenBlacklistService blacklistService) // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         {
             _userRepository = userRepository;
             _passwordService = passwordService;
             _jwtService = jwtService;
-            _blacklistService = blacklistService; // ¡û Ìí¼ÓÕâ¸ö¸³Öµ
+            _blacklistService = blacklistService; // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
         }
 
         /// <summary>
-        /// ÓÃ»§×¢²á
+        /// ï¿½Ã»ï¿½×¢ï¿½ï¿½
         /// </summary>
-        [HttpPost("register")]//POST ÇëÇó ¹ã·ºÓÃÓÚ´´½¨»òÌá½»Êý¾Ý£¬ÊÊºÏ´¦Àí¸´ÔÓ»ò¾ßÓÐ±£ÃÜÐÔµÄÇëÇó
-        [Authorize(Roles = "Admin")] // Ìí¼Ó¹ÜÀíÔ±È¨ÏÞ¿ØÖÆ
+        [HttpPost("register")]//POST ï¿½ï¿½ï¿½ï¿½ ï¿½ã·ºï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½á½»ï¿½ï¿½ï¿½Ý£ï¿½ï¿½ÊºÏ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó»ï¿½ï¿½ï¿½Ð±ï¿½ï¿½ï¿½ï¿½Ôµï¿½ï¿½ï¿½ï¿½ï¿½
+        [Authorize(Roles = "Admin")] // ï¿½ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½Ô±È¨ï¿½Þ¿ï¿½ï¿½ï¿½
 
-        /*µ±Äã¶¨ÒåÒ»¸ö·½·¨²ÎÊý²¢Ê¹ÓÃ [FromBody] ÌØÐÔÊ±£¬±íÊ¾Õâ¸ö²ÎÊýµÄÊý¾Ý½«´ÓÇëÇóµÄÖ÷Ìå£¨body£©ÖÐ»ñÈ¡£¬Í¨³£ÓÃÓÚ´¦Àí POST¡¢PUT µÈ·½·¨µÄÇëÇóÌå¡£
-          ÔÚ¸ÃÊ¾ÀýÖÐ£¬RegisterRequest ÊÇÒ»¸ö°üº¬¶à¸ö×Ö¶ÎµÄ¸´ºÏ¶ÔÏó£¨ÀýÈç£¬ÓÃ»§Ãû¡¢ÓÊÏä¡¢ÃÜÂëµÈ£©¡£
-          Ê¹ÓÃ [FromBody]£¬ASP.NET Core »á×Ô¶¯½«ÇëÇóÌåÖÐµÄ JSON Êý¾Ý·´ÐòÁÐ»¯ÎªÕâ¸ö RegisterRequest ¶ÔÏó¡£
-          ¼ÙÉèÄãÓÐÒÔÏÂ JSON ÇëÇóÌå£º£¨ÓÃ»§×¢²áºó·¢µ½ºóÌ¨µÄ£©
+        /*ï¿½ï¿½ï¿½ã¶¨ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ [FromBody] ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½å£¨bodyï¿½ï¿½ï¿½Ð»ï¿½È¡ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½ POSTï¿½ï¿½PUT ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½å¡£
+          ï¿½Ú¸ï¿½Ê¾ï¿½ï¿½ï¿½Ð£ï¿½RegisterRequest ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶ÎµÄ¸ï¿½ï¿½Ï¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ç£¬ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ä¡¢ï¿½ï¿½ï¿½ï¿½È£ï¿½ï¿½ï¿½
+          Ê¹ï¿½ï¿½ [FromBody]ï¿½ï¿½ASP.NET Core ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ JSON ï¿½ï¿½ï¿½Ý·ï¿½ï¿½ï¿½ï¿½Ð»ï¿½Îªï¿½ï¿½ï¿½ RegisterRequest ï¿½ï¿½ï¿½ï¿½
+          ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ JSON ï¿½ï¿½ï¿½ï¿½ï¿½å£ºï¿½ï¿½ï¿½Ã»ï¿½×¢ï¿½ï¿½ó·¢µï¿½ï¿½ï¿½Ì¨ï¿½Ä£ï¿½
           {
           "UserName": "exampleUser",
           "Email": "example@example.com",
           "Password": "securePassword"
           }
-          Èç¹ûÄãÃ»ÓÐÊ¹ÓÃ[FromBody]£¬¿ò¼Ü½«ÎÞ·¨ÖªµÀÄãÏ£Íû´ÓÇëÇóÌåÖÐÌáÈ¡ÕâÐ©Êý¾Ý¡£Ê¹ÓÃºó£¬¿ò¼Ü»á×Ô¶¯Ê¶±ð£¬²¢°ÑÕâÐ©ÐÅÏ¢Ìî³äµ½ RegisterRequest ¶ÔÏóÖÐ¡£*/
+          ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ê¹ï¿½ï¿½[FromBody]ï¿½ï¿½ï¿½ï¿½Ü½ï¿½ï¿½Þ·ï¿½Öªï¿½ï¿½ï¿½ï¿½Ï£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½Ð©ï¿½ï¿½ï¿½Ý¡ï¿½Ê¹ï¿½Ãºó£¬¿ï¿½Ü»ï¿½ï¿½Ô¶ï¿½Ê¶ï¿½ð£¬²ï¿½ï¿½ï¿½ï¿½ï¿½Ð©ï¿½ï¿½Ï¢ï¿½ï¿½äµ½ RegisterRequest ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½*/
         public async Task<ApiResponse<UserResponse>> Register([FromBody] RegisterRequest request)
         {
-            // ¼ì²éÓÃ»§ÃûÊÇ·ñÒÑ´æÔÚ
+            // ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ñ´ï¿½ï¿½ï¿½
             if (await _userRepository.IsUserNameExistAsync(request.UserName))
             {
-                return ApiResponse<UserResponse>.ErrorResult("ÓÃ»§ÃûÒÑ´æÔÚ", "USERNAME_EXISTS");
+                return ApiResponse<UserResponse>.ErrorResult("ï¿½Ã»ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½ï¿½ï¿½", "USERNAME_EXISTS");
             }
 
-            // ¼ì²éÓÊÏäÊÇ·ñÒÑ´æÔÚ
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ñ´ï¿½ï¿½ï¿½
             if (await _userRepository.IsEmailExistAsync(request.Email))
             {
-                return ApiResponse<UserResponse>.ErrorResult("ÓÊÏäÒÑ´æÔÚ", "EMAIL_EXISTS");
+                return ApiResponse<UserResponse>.ErrorResult("ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½ï¿½ï¿½", "EMAIL_EXISTS");
             }
 
-            // ´´½¨ÓÃ»§
+            // ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½
             var passwordHash = _passwordService.HashPassword(request.Password);
             var user = new User(request.UserName, request.Email, passwordHash);
 
@@ -74,30 +74,30 @@ namespace IdentityService.WebAPI.Controllers
                 user.UpdateProfile(request.PhoneNumber);
             }
 
-            // ¹¤×÷µ¥Ôª»á×Ô¶¯±£´æ
-            // ? ÁÙÊ±Ìí¼ÓÊÖ¶¯±£´æ
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôªï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½
+            // ? ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶ï¿½ï¿½ï¿½ï¿½ï¿½
             await _userRepository.AddAsync(user);
 
-            // Ö±½Ó·ÖÅä¹ÜÀíÔ±½ÇÉ«£¨¼ò»¯Éè¼Æ£©
-            // 11111111-1111-1111-1111-111111111111ÊÇ¹ÜÀíÔ±½ÇÉ«ID£¬ÔÚIdentityDbContext.csÒÑ¾­ÉèÖÃºÃÁË
-            //ÕâÀïÊÇ°ÑÕâ¸ö32Î»µÄ×Ö·û´®×ª»»³ÉGuidÀàÐÍ£¬ÒòÎªRoleIdÊÇGuidÀàÐÍµÄ
-            //Äã¿ÉÒÔ¿ÉÒÔ·â×°Õâ¸öID£¬ÈçÏÂËùÊ¾£º
+            // Ö±ï¿½Ó·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ£ï¿½
+            // 11111111-1111-1111-1111-111111111111ï¿½Ç¹ï¿½ï¿½ï¿½Ô±ï¿½ï¿½É«IDï¿½ï¿½ï¿½ï¿½IdentityDbContext.csï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½Ãºï¿½ï¿½ï¿½
+            //ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½32Î»ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½Guidï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ÎªRoleIdï¿½ï¿½Guidï¿½ï¿½ï¿½Íµï¿½
+            //ï¿½ï¿½ï¿½ï¿½Ô¿ï¿½ï¿½Ô·ï¿½×°ï¿½ï¿½ï¿½IDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½
             //public static readonly Guid AdminRoleId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-            //È»ºóÔÚÕâÀïÊ¹ÓÃAdminRoleId£¬µ«ÊÇÎªÁË¼òµ¥Æð¼û£¬ÕâÀïÖ±½ÓÊ¹ÓÃGuid.Parse
+            //È»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½AdminRoleIdï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½Ë¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½Ê¹ï¿½ï¿½Guid.Parse
             var adminRoleId = Guid.Parse("11111111-1111-1111-1111-111111111111"); 
             await _userRepository.AssignRoleAsync(user.Id, adminRoleId);
 
             var response = await ConvertToUserResponse(user);
-            return ApiResponse<UserResponse>.SuccessResult(response, "¹ÜÀíÔ±×¢²á³É¹¦");
+            return ApiResponse<UserResponse>.SuccessResult(response, "ï¿½ï¿½ï¿½ï¿½Ô±×¢ï¿½ï¿½É¹ï¿½");
         }
 
         /// <summary>
-        /// ÓÃ»§µÇÂ¼
+        /// ï¿½Ã»ï¿½ï¿½ï¿½Â¼
         /// </summary>
         [HttpPost("login")]
         public async Task<ApiResponse<LoginResponse>> Login([FromBody] LoginRequest request)
         {
-            // ²éÕÒÓÃ»§£¨Ö§³ÖÓÃ»§Ãû»òÓÊÏäµÇÂ¼£©
+            // ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Ö§ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½
             User? user = null;
             if (request.UserNameOrEmail.Contains("@"))
             {
@@ -110,36 +110,36 @@ namespace IdentityService.WebAPI.Controllers
 
             if (user == null)
             {
-                return ApiResponse<LoginResponse>.ErrorResult("ÓÃ»§²»´æÔÚ", "USER_NOT_FOUND");
+                return ApiResponse<LoginResponse>.ErrorResult("ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", "USER_NOT_FOUND");
             }
 
             if (!user.IsActive)
             {
-                return ApiResponse<LoginResponse>.ErrorResult("ÕË»§ÒÑ±»½ûÓÃ", "ACCOUNT_DISABLED");
+                return ApiResponse<LoginResponse>.ErrorResult("ï¿½Ë»ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½", "ACCOUNT_DISABLED");
             }
 
-            // ÑéÖ¤ÃÜÂë
+            // ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½ï¿½
             if (!_passwordService.VerifyPassword(request.Password, user.PasswordHash))
             {
-                return ApiResponse<LoginResponse>.ErrorResult("ÃÜÂë´íÎó", "INVALID_PASSWORD");
+                return ApiResponse<LoginResponse>.ErrorResult("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", "INVALID_PASSWORD");
             }
 
-            // ¼ÇÂ¼µÇÂ¼Ê±¼ä
+            // ï¿½ï¿½Â¼ï¿½ï¿½Â¼Ê±ï¿½ï¿½
             user.RecordLogin();
 
-            // »ñÈ¡ÓÃ»§½ÇÉ«
+            // ï¿½ï¿½È¡ï¿½Ã»ï¿½ï¿½ï¿½É«
             var roles = await _userRepository.GetUserRolesAsync(user.Id);
 
-            // Éú³ÉJWT Token
+            // ï¿½ï¿½ï¿½ï¿½JWT Token
             var claims = new List<Claim>
             {
-                //ÕâÀïµÄÉùÃ÷¶¼µÃÊÇ×Ö·û´®ÀàÐÍµÄ£¬ËùÒÔÕâÀïÒª½«user.IdµÄGuidÀàÐÍ×ª»»³É×Ö·û´®ÀàÐÍ 
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÍµÄ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½user.Idï¿½ï¿½Guidï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(ClaimTypes.Name, user.UserName),
                 new(ClaimTypes.Email, user.Email)
             };
 
-            // Ìí¼Ó½ÇÉ«ÉùÃ÷
+            // ï¿½ï¿½ï¿½Ó½ï¿½É«ï¿½ï¿½ï¿½ï¿½
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role.Name));
@@ -156,28 +156,28 @@ namespace IdentityService.WebAPI.Controllers
                 User = userResponse
             };
 
-            return ApiResponse<LoginResponse>.SuccessResult(loginResponse, "µÇÂ¼³É¹¦");
+            return ApiResponse<LoginResponse>.SuccessResult(loginResponse, "ï¿½ï¿½Â¼ï¿½É¹ï¿½");
         }
 
         /// <summary>
-        /// »ñÈ¡µ±Ç°ÓÃ»§ÐÅÏ¢
+        /// ï¿½ï¿½È¡ï¿½ï¿½Ç°ï¿½Ã»ï¿½ï¿½ï¿½Ï¢
         /// </summary>
         [HttpGet("me")]
-        [Authorize(Roles = "Admin")] // Ìí¼Ó¹ÜÀíÔ±È¨ÏÞ¿ØÖÆ
+        [Authorize(Roles = "Admin")] // ï¿½ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½Ô±È¨ï¿½Þ¿ï¿½ï¿½ï¿½
         public async Task<ApiResponse<UserResponse>> GetCurrentUser()
         {
-            //ÕâÐÐ´úÂë´ÓÒÑÑéÖ¤µÄÓÃ»§ÖÐ²éÕÒÓÃ»§±êÊ¶·ûµÄÉùÃ÷£¨Claim£©¡£´ËÉùÃ÷Í¨³£ÔÚÓÃ»§µÇÂ¼Ê±Éú³É£¬²¢ÓÃÓÚ±êÊ¶ÓÃ»§¡£
+            //ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ð²ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Claimï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Â¼Ê±ï¿½ï¿½ï¿½É£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú±ï¿½Ê¶ï¿½Ã»ï¿½ï¿½ï¿½
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            //Guid.TryParse(userIdClaim.Value, out var userId)ÕâÀïÒª°ÑUserIdµÄ×Ö·û´®ÀàÐÍ£¨126ÐÐ£©ÔÙ»»³ÉGuidÀàÐÍ
+            //Guid.TryParse(userIdClaim.Value, out var userId)ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½UserIdï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½126ï¿½Ð£ï¿½ï¿½Ù»ï¿½ï¿½ï¿½Guidï¿½ï¿½ï¿½ï¿½
             if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
             {
-                return ApiResponse<UserResponse>.ErrorResult("ÎÞÐ§µÄÓÃ»§Éí·Ý", "INVALID_USER_IDENTITY");
+                return ApiResponse<UserResponse>.ErrorResult("ï¿½ï¿½Ð§ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½", "INVALID_USER_IDENTITY");
             }
 
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {
-                return ApiResponse<UserResponse>.ErrorResult("ÓÃ»§²»´æÔÚ", "USER_NOT_FOUND");
+                return ApiResponse<UserResponse>.ErrorResult("ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", "USER_NOT_FOUND");
             }
 
             var response = await ConvertToUserResponse(user);
@@ -185,105 +185,105 @@ namespace IdentityService.WebAPI.Controllers
         }
 
         /// <summary>
-        /// ÐÞ¸ÄÃÜÂë
+        /// ï¿½Þ¸ï¿½ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         [HttpPost("change-password")]
-        [Authorize(Roles = "Admin")] // Ìí¼Ó¹ÜÀíÔ±È¨ÏÞ¿ØÖÆ
+        [Authorize(Roles = "Admin")] // ï¿½ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½Ô±È¨ï¿½Þ¿ï¿½ï¿½ï¿½
         public async Task<ApiResponse> ChangePassword([FromBody] ChangePasswordRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
             {
-                return ApiResponse.ErrorResult("ÎÞÐ§µÄÓÃ»§Éí·Ý", "INVALID_USER_IDENTITY");
+                return ApiResponse.ErrorResult("ï¿½ï¿½Ð§ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½", "INVALID_USER_IDENTITY");
             }
 
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {
-                return ApiResponse.ErrorResult("ÓÃ»§²»´æÔÚ", "USER_NOT_FOUND");
+                return ApiResponse.ErrorResult("ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", "USER_NOT_FOUND");
             }
 
-            // ÑéÖ¤µ±Ç°ÃÜÂë
+            // ï¿½ï¿½Ö¤ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½
             if (!_passwordService.VerifyPassword(request.CurrentPassword, user.PasswordHash))
             {
-                return ApiResponse.ErrorResult("µ±Ç°ÃÜÂë´íÎó", "INVALID_CURRENT_PASSWORD");
+                return ApiResponse.ErrorResult("ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", "INVALID_CURRENT_PASSWORD");
             }
 
-            // ¸üÐÂÃÜÂë
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             var newPasswordHash = _passwordService.HashPassword(request.NewPassword);
             user.UpdatePassword(newPasswordHash);
 
-            return ApiResponse.SuccessResult("ÃÜÂëÐÞ¸Ä³É¹¦");
+            return ApiResponse.SuccessResult("ï¿½ï¿½ï¿½ï¿½ï¿½Þ¸Ä³É¹ï¿½");
         }
 
         /*
         /// <summary>
-        /// ×¢ÏúµÇÂ¼¼òµ¥°æ±¾£¬²»ÊµÏÖºÚÃûµ¥»úÖÆ
+        /// ×¢ï¿½ï¿½ï¿½ï¿½Â¼ï¿½òµ¥°æ±¾ï¿½ï¿½ï¿½ï¿½Êµï¿½Öºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         [HttpPost("logout")]
         [Authorize]
         public ApiResponse Logout()
         {
-            // ÔÚÊµ¼ÊÓ¦ÓÃÖÐ£¬¿ÉÒÔÔÚÕâÀïÊµÏÖtokenºÚÃûµ¥»úÖÆ
-            // Ä¿Ç°JWTÊÇÎÞ×´Ì¬µÄ£¬¼´·þÎñÆ÷ÆäÊµÃ»±£´æÈÎºÎÐÅÏ¢£¬¿Í»§¶ËÉ¾³ýtoken¼´¿É
-            // Èç¹ûÒªÊµÏÖºÚÃûµ¥»úÖÆ£¬ÔòÐèÒª½«Token´¢´æÔÚ·þÎñÆ÷ÖÐ£¬²¢ÔÚ·þÎñÆ÷ÖÐ½ûÓÃ
-            return ApiResponse.SuccessResult("×¢Ïú³É¹¦");
+            // ï¿½ï¿½Êµï¿½ï¿½Ó¦ï¿½ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½tokenï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            // Ä¿Ç°JWTï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÊµÃ»ï¿½ï¿½ï¿½ï¿½ï¿½Îºï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Í»ï¿½ï¿½ï¿½É¾ï¿½ï¿½tokenï¿½ï¿½ï¿½ï¿½
+            // ï¿½ï¿½ï¿½ÒªÊµï¿½Öºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ£ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Tokenï¿½ï¿½ï¿½ï¿½ï¿½Ú·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½Ú·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð½ï¿½ï¿½ï¿½
+            return ApiResponse.SuccessResult("×¢ï¿½ï¿½ï¿½É¹ï¿½");
         }
         */
 
         /// <summary>
-        /// ×¢ÏúµÇÂ¼
+        /// ×¢ï¿½ï¿½ï¿½ï¿½Â¼
         /// </summary>
         [HttpPost("logout")]
-        //Õâ¸öÌØÐÔ±íÊ¾Ö»ÓÐ¾­¹ý authenticated ÓÃ»§²ÅÄÜµ÷ÓÃÕâ¸ö·½·¨£¬È·±£Î´µÇÂ¼ÓÃ»§ÎÞ·¨×¢Ïú¡£
-        [Authorize(Roles = "Admin")] // Ìí¼Ó¹ÜÀíÔ±È¨ÏÞ¿ØÖÆ
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô±ï¿½Ê¾Ö»ï¿½Ð¾ï¿½ï¿½ï¿½ authenticated ï¿½Ã»ï¿½ï¿½ï¿½ï¿½Üµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½Î´ï¿½ï¿½Â¼ï¿½Ã»ï¿½ï¿½Þ·ï¿½×¢ï¿½ï¿½ï¿½ï¿½
+        [Authorize(Roles = "Admin")] // ï¿½ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½Ô±È¨ï¿½Þ¿ï¿½ï¿½ï¿½
         public async Task<ApiResponse> Logout()
         {
             var token = ExtractTokenFromRequest();
             if (!string.IsNullOrEmpty(token))
             {
-                //·µ»ØÒ»¸öÔª×é (tokenId, expiry)¡£ÆäÖÐ tokenId ÊÇ JWT ÖÐÎ¨Ò»±êÊ¶·û£¬expiry ÊÇÁîÅÆµÄ¹ýÆÚÊ±¼ä
+                //ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ôªï¿½ï¿½ (tokenId, expiry)ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ tokenId ï¿½ï¿½ JWT ï¿½ï¿½Î¨Ò»ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½ï¿½expiry ï¿½ï¿½ï¿½ï¿½ï¿½ÆµÄ¹ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
                 var (tokenId, expiry) = ExtractTokenInfo(token);
                 if (!string.IsNullOrEmpty(tokenId))
                 {
-                    // ½«Token¼ÓÈëºÚÃûµ¥
+                    // ï¿½ï¿½Tokenï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                     await _blacklistService.AddToBlacklistAsync(tokenId, expiry);
                 }
             }
 
-            return ApiResponse.SuccessResult("×¢Ïú³É¹¦");
+            return ApiResponse.SuccessResult("×¢ï¿½ï¿½ï¿½É¹ï¿½");
         }
 
         /// <summary>
-        /// ½ûÓÃÓÃ»§£¨¹ÜÀíÔ±¹¦ÄÜ£©
+        /// ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½Ü£ï¿½
         /// </summary>
         [HttpPost("disable-user/{userId}")]
-        [Authorize(Roles = "Admin")] // Ìí¼Ó¹ÜÀíÔ±È¨ÏÞ¿ØÖÆ
+        [Authorize(Roles = "Admin")] // ï¿½ï¿½ï¿½Ó¹ï¿½ï¿½ï¿½Ô±È¨ï¿½Þ¿ï¿½ï¿½ï¿½
         public async Task<ApiResponse> DisableUser(Guid userId)
         {
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {
-                return ApiResponse.ErrorResult("ÓÃ»§²»´æÔÚ", "USER_NOT_FOUND");
+                return ApiResponse.ErrorResult("ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", "USER_NOT_FOUND");
             }
 
-            // ½ûÓÃÓÃ»§
+            // ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½
             user.Deactivate();
 
-            // ½«ÓÃ»§ËùÓÐToken¼ÓÈëºÚÃûµ¥
+            // ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½Tokenï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             await _blacklistService.BlacklistUserTokensAsync(userId);
 
-            return ApiResponse.SuccessResult("ÓÃ»§ÒÑ±»½ûÓÃ");
+            return ApiResponse.SuccessResult("ï¿½Ã»ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½");
         }
 
-        //´Ó HTTP ÇëÇóµÄÍ·²¿ÖÐÌáÈ¡ Bearer ÁîÅÆ
+        //ï¿½ï¿½ HTTP ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ Bearer ï¿½ï¿½ï¿½ï¿½
         private string? ExtractTokenFromRequest()
         {
-            //Ö±½Ó´Óµ±Ç°ÀàµÄ Request ÊôÐÔÌáÈ¡ÊÚÈ¨Í·£¬¶ø²»ÊÇ´Ó HttpContext ÖÐ»ñÈ¡¡£ÕâÑù¿ÉÒÔÈ·±£ÔÚ¿ØÖÆÆ÷ÖÐÖ±½Ó·ÃÎÊÇëÇóÍ·ÐÅÏ¢¡£
+            //Ö±ï¿½Ó´Óµï¿½Ç°ï¿½ï¿½ï¿½ Request ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½È¨Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç´ï¿½ HttpContext ï¿½Ð»ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È·ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½Ó·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½Ï¢ï¿½ï¿½
             var authHeader = Request.Headers["Authorization"].FirstOrDefault();
             if (authHeader?.StartsWith("Bearer ") == true)
             {
-                //Ê¹ÓÃ Substring ·½·¨È¥µô "Bearer " Ç°×º£¬²¢·µ»ØÊ£Óà²¿·Ö£¬Í¨³£ÊÇÊµ¼ÊµÄÁîÅÆ¡£Trim() ÓÃÓÚÈ¥³ýÇ°ºóµÄ¿Õ¸ñ¡£
+                //Ê¹ï¿½ï¿½ Substring ï¿½ï¿½ï¿½ï¿½È¥ï¿½ï¿½ "Bearer " Ç°×ºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê£ï¿½à²¿ï¿½Ö£ï¿½Í¨ï¿½ï¿½ï¿½ï¿½Êµï¿½Êµï¿½ï¿½ï¿½ï¿½Æ¡ï¿½Trim() ï¿½ï¿½ï¿½ï¿½È¥ï¿½ï¿½Ç°ï¿½ï¿½Ä¿Õ¸ï¿½
                 return authHeader.Substring("Bearer ".Length).Trim();
             }
             return null;
