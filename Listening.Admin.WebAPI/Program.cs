@@ -138,7 +138,9 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(
                 "http://localhost:3000",           // 本地开发
                 "http://3.107.216.226",            // EC2 前端
-                "https://*.vercel.app"             // Vercel 部署
+                "https://*.vercel.app",             // Vercel 部署
+                "https://www.boren-space.it.com",          // 自定义域名
+                "https://boren-space.it.com"               // 根域名（如果需要）
               )
               .SetIsOriginAllowedToAllowWildcardSubdomains()  // 允许 Vercel 子域名
               .AllowAnyMethod()

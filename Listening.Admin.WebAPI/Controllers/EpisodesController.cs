@@ -1,4 +1,4 @@
-﻿using Listening.Admin.WebAPI.DTOs;
+using Listening.Admin.WebAPI.DTOs;
 using Listening.Admin.WebAPI.Services;
 using Listening.Domain;
 using Listening.Infrastructure;
@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +15,14 @@ using System.Threading.Tasks;
 using Zbw.ASPNETCore.DTOs;
 using Listening.Domain.Utils;
 
+
 namespace Listening.Admin.WebAPI.Controllers
 {
+    /// <summary>
+    /// 文件上传结果
+    /// </summary>
+    internal record FileUploadResult(Guid FileId, string RemoteUrl);
+
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Roles = "Admin")]
@@ -26,19 +33,22 @@ namespace Listening.Admin.WebAPI.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<EpisodesController> _logger;
         private readonly AudioAnalysisService _audioAnalysis;
+        private readonly IConfiguration _configuration;
 
         public EpisodesController(
             IListeningRepository repository,
             FileValidationService fileValidation,
             IHttpClientFactory httpClientFactory,
             ILogger<EpisodesController> logger,
-            AudioAnalysisService audioAnalysis)
+            AudioAnalysisService audioAnalysis,
+            IConfiguration configuration)
         {
             _repository = repository;
             _fileValidation = fileValidation;
             _httpClientFactory = httpClientFactory;
             _logger = logger;
             _audioAnalysis = audioAnalysis;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -76,17 +86,17 @@ namespace Listening.Admin.WebAPI.Controllers
                 _logger.LogInformation($"Audio duration analyzed: {audioDurationInSeconds} seconds ({TimeFormatHelper.FormatDuration(audioDurationInSeconds)})");
 
                 // 5. Upload audio file to FileService
-                var audioFileId = await UploadFileToFileService(request.AudioFile, FileService.Domain.Enums.FileType.Audio);
+                var audioUploadResult = await UploadFileToFileService(request.AudioFile, FileService.Domain.Enums.FileType.Audio);
 
                 // 6. Upload subtitle file (if exists)
-                Guid? subtitleFileId = null;
+                FileUploadResult? subtitleUploadResult = null;
                 if (request.SubtitleFile != null)
-                    subtitleFileId = await UploadFileToFileService(request.SubtitleFile, FileService.Domain.Enums.FileType.Subtitle);
+                    subtitleUploadResult = await UploadFileToFileService(request.SubtitleFile, FileService.Domain.Enums.FileType.Subtitle);
 
                 // 7. Upload cover image (if exists)
-                Guid? coverImageFileId = null;
+                FileUploadResult? coverImageUploadResult = null;
                 if (request.CoverImage != null)
-                    coverImageFileId = await UploadFileToFileService(request.CoverImage, FileService.Domain.Enums.FileType.Image);
+                    coverImageUploadResult = await UploadFileToFileService(request.CoverImage, FileService.Domain.Enums.FileType.Image);
 
                 // 8. Create Episode
                 var episode = new Episode(request.Title);
@@ -94,22 +104,19 @@ namespace Listening.Admin.WebAPI.Controllers
                 // Update basic info
                 episode.UpdateInfo(request.Title, request.Description);
 
-                // Set audio URL and duration
-                var audioDownloadUrl = new Uri($"http://localhost:7292/api/File/{audioFileId}/download");
-                episode.UpdateAudio(audioDownloadUrl, audioDurationInSeconds);
+                // Set audio URL and duration (use RemoteUrl from FileService)
+                episode.UpdateAudio(new Uri(audioUploadResult.RemoteUrl), audioDurationInSeconds);
 
                 // Set subtitle URL
-                if (subtitleFileId.HasValue)
+                if (subtitleUploadResult != null)
                 {
-                    var subtitleUrl = new Uri($"http://localhost:7292/api/File/{subtitleFileId}/download");
-                    episode.UpdateSubtitle(subtitleUrl);
+                    episode.UpdateSubtitle(new Uri(subtitleUploadResult.RemoteUrl));
                 }
 
                 // Set cover image URL
-                if (coverImageFileId.HasValue)
+                if (coverImageUploadResult != null)
                 {
-                    var coverImageUrl = new Uri($"http://localhost:7292/api/File/{coverImageFileId}/download");
-                    episode.UpdateCoverImage(coverImageUrl);
+                    episode.UpdateCoverImage(new Uri(coverImageUploadResult.RemoteUrl));
                 }
 
                 // 9. Save to database
@@ -136,7 +143,7 @@ namespace Listening.Admin.WebAPI.Controllers
         /// <summary>
         /// Upload file to FileService
         /// </summary>
-        private async Task<Guid> UploadFileToFileService(IFormFile file, FileService.Domain.Enums.FileType fileType)
+        private async Task<FileUploadResult> UploadFileToFileService(IFormFile file, FileService.Domain.Enums.FileType fileType)
         {
             var httpClient = _httpClientFactory.CreateClient();
 
@@ -153,8 +160,11 @@ namespace Listening.Admin.WebAPI.Controllers
             // Set storage type to Public
             content.Add(new StringContent("Public"), "StorageType");
 
+            // Get FileService base URL from configuration
+            var fileServiceBaseUrl = _configuration.GetValue<string>("FileService:BaseUrl") ?? "http://localhost:5002";
+
             // Upload to FileService
-            var response = await httpClient.PostAsync("http://localhost:7292/api/File/upload", content);
+            var response = await httpClient.PostAsync($"{fileServiceBaseUrl}/api/File/upload", content);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -168,8 +178,12 @@ namespace Listening.Admin.WebAPI.Controllers
             using var jsonDoc = System.Text.Json.JsonDocument.Parse(responseContent);
             var dataElement = jsonDoc.RootElement.GetProperty("data");
             var fileIdString = dataElement.GetProperty("fileId").GetString();
+            var remoteUrl = dataElement.GetProperty("remoteUrl").GetString();
 
-            return Guid.Parse(fileIdString!);
+            return new FileUploadResult(
+                Guid.Parse(fileIdString!),
+                remoteUrl!
+            );
         }
 
         /// <summary>

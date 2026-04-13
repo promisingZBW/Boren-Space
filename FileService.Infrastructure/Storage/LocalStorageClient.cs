@@ -18,7 +18,7 @@ namespace FileService.Infrastructure.Storage
         private readonly LocalStorageOptions _options;
         private readonly ILogger<LocalStorageClient> _logger;
 
-        public StorageType StorageType => StorageType.Backup;
+        public StorageType StorageType => StorageType.Public;
 
         public LocalStorageClient(IOptions<StorageOptions> options, ILogger<LocalStorageClient> logger)
         {

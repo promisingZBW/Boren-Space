@@ -26,10 +26,18 @@ namespace FileService.Domain.Services
 
             // 通过StorageType区分不同的存储客户端
             var clients = storageClients.ToList();
-            _backupStorage = clients.FirstOrDefault(c => c.StorageType == StorageType.Backup)
-                ?? throw new InvalidOperationException("未找到备份存储客户端");
+            
+            // 公网存储客户端必须存在
             _remoteStorage = clients.FirstOrDefault(c => c.StorageType == StorageType.Public)
                 ?? throw new InvalidOperationException("未找到公网存储客户端");
+            
+            // 备份存储客户端可选，如果没有则使用公网存储客户端
+            _backupStorage = clients.FirstOrDefault(c => c.StorageType == StorageType.Backup);
+            if (_backupStorage == null)
+            {
+                _backupStorage = _remoteStorage;
+                Console.WriteLine("⚠️ 未找到专用备份存储客户端，使用公网存储客户端作为备份");
+            }
         }
 
 
